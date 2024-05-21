@@ -2,14 +2,18 @@ package com.example.todo.userapi.api;
 
 import com.example.todo.userapi.dto.request.UserSignInRequestDTO;
 import com.example.todo.userapi.dto.request.UserSignUpRequestDTO;
+import com.example.todo.userapi.dto.response.LoginResponseDTO;
 import com.example.todo.userapi.dto.response.UserSignUpResponseDTO;
 import com.example.todo.userapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -46,11 +50,8 @@ public class UserController {
     ) {
         log.info("/api/auth POST - {}", dto);
 
-        if (result.hasErrors()) {
-            log.warn(result.toString());
-            return ResponseEntity.badRequest()
-                    .body(result.getFieldErrors());
-        }
+        ResponseEntity<List<FieldError>> resultEntity = getFieldErrorResponseEntity(result);
+        if (resultEntity != null) return resultEntity;
 
         try {
             UserSignUpResponseDTO responseDTO = userService.create(dto);
@@ -62,6 +63,8 @@ public class UserController {
         }
 
     }
+
+    
 
     // 로그인 요청 처리 메서드를 선언하세요. POST: /api/auth/signin
     // LoginRequestDTO 클래스를 생성해서 요청 값을 받아주세요.
@@ -75,19 +78,28 @@ public class UserController {
     ) {
         log.info("/api/auth/signin: POST! - {}", dto);
 
+        ResponseEntity<List<FieldError>> response = getFieldErrorResponseEntity(result);
+        if (response != null) return response;
 
         try {
-            boolean flag = userService.checkLogin(dto);
-            if (flag) {
-                return ResponseEntity.ok().body("로그인 성공!");
-            } else {
-                return ResponseEntity.badRequest().body("비밀번호가 맞지 않습니다.");
-            }
+            LoginResponseDTO responseDTO = userService.authenticate(dto);
+            return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("이메일이 존재하지 않습니다.");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
 
+    }
+
+    // 유효성 검사 메서드
+    private static ResponseEntity<List<FieldError>> getFieldErrorResponseEntity(BindingResult result) {
+        if (result.hasErrors()) {
+            log.warn(result.toString());
+            return ResponseEntity.badRequest()
+                    .body(result.getFieldErrors());
+        }
+        return null;
     }
 
 }

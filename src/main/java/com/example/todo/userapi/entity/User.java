@@ -31,4 +31,8 @@ public class User {
 
     @CreationTimestamp
     private LocalDateTime joinDate;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default // Builder의 기본 값
+    private Role role = Role.COMMON; // 유저 권한
 }
