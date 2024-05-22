@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: update
     database: mysql
+  servlet:
+    multipart:
+      max-file-size: 10MB # 1 file maximum size
+      max-request-size: 20MB # maximum size for every request
 
 # swagger setting
 springdoc:
@@ -24,3 +28,7 @@ springdoc:
 
 jwt:
   secret: yVf6dUeXzHFWcOhu+h40sXkMop3jBB1pXF2Z97KBo06VISECAnUuK+Q7noKhDJVX4gtWo7LiQzb3KfibZAbO9A==
+
+# upload file path
+upload:
+  path: C:/todo_upload
