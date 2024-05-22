@@ -56,14 +56,9 @@ public class UserController {
         ResponseEntity<List<FieldError>> resultEntity = getFieldErrorResponseEntity(result);
         if (resultEntity != null) return resultEntity;
 
-        try {
-            UserSignUpResponseDTO responseDTO = userService.create(dto);
-            return ResponseEntity.ok().body(responseDTO);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        UserSignUpResponseDTO responseDTO = userService.create(dto);
+        return ResponseEntity.ok().body(responseDTO);
 
     }
 
@@ -84,13 +79,9 @@ public class UserController {
         ResponseEntity<List<FieldError>> response = getFieldErrorResponseEntity(result);
         if (response != null) return response;
 
-        try {
-            LoginResponseDTO responseDTO = userService.authenticate(dto);
-            return ResponseEntity.ok().body(responseDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
+        LoginResponseDTO responseDTO = userService.authenticate(dto);
+        return ResponseEntity.ok().body(responseDTO);
 
 
     }
@@ -104,7 +95,8 @@ public class UserController {
             @AuthenticationPrincipal TokenUserInfo userInfo
             ) {
         log.info("/api/auth/promote - PUT!");
-        userInfo.getRole();
+        LoginResponseDTO loginResponseDTO = userService.promoteToPremium(userInfo);
+        return ResponseEntity.ok().body(loginResponseDTO);
     }
 
     // 유효성 검사 메서드
