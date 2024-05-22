@@ -31,6 +31,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
+    @Value("${kakao.client_id}")
+    private String KAKAO_CLIENT_ID;
+
+    @Value("${kakao.redirect_url}")
+    private String KAKAO_REDIRECT_URL;
+
+    @Value("${kakao.client_secret}")
+    private String KAKAO_CLIENT_SECRET;
+
     @Value("${upload.path}")
     private String uploadRootPath;
 
@@ -132,6 +141,10 @@ public class UserService {
 
         // DB에는 파일명만 저장. service가 가지고 있는 Root Path와 연결해서 리턴.
         return uploadRootPath + "/" + user.getProfileImg();
+
+    }
+
+    public void kakaoService(String code) {
 
     }
 }
