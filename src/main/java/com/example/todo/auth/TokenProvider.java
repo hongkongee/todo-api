@@ -94,6 +94,12 @@ public class TokenProvider {
         return claims;
     }
 
+    // 리프레시 토큰 만료시간만 추출하기
+    public Date getExpiryDate(String token) {
+        Claims claims = getClaims(token, REFRESH_SECRET_KEY);
+        return claims.getExpiration();
+    }
+
     /**
      * 클라이언트가 전송한 토큰을 디코딩하여 토큰의 위조 여부를 확인
      * 토큰을 json으로 파싱해서 클레임(토큰 정보)을 리턴

@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -99,6 +100,12 @@ public class UserService {
         // 로그인 성공 후에 클라이언트에게 무엇을 리턴해줄 것인가?
         // -> JWT를 클라이언트에게 발급 -> 로그인 유지를 위해
         Map<String, String> token = getTokenMap(user);
+
+        // 리프레시 토큰은 수명이 길다. (최소 2~3주, 2~3개월도 가능)
+        // 데이터베이스에 저장해 놓고, 새로운 액세스 토큰 요청 때마다 만료일을 조회해서 비교
+        user.changeRefreshToken(token.get("refresh_token"));
+        user.changeRefreshExpiryDate(tokenProvider.getExpiryDate(token.get("refresh_token")));
+        userRepository.save(user);
 
         return new LoginResponseDTO(user, token);
     }
@@ -306,6 +313,22 @@ public class UserService {
             return responseData.getBody();
         }
 
+        return null;
+    }
+
+    public String renewalAccessToken(Map<String, String> tokenRequest) {
+        String refreshToken = tokenRequest.get("refreshToken");
+        boolean isValid = tokenProvider.validateRefreshToken(refreshToken);
+        if (isValid) {
+            // 토큰 값이 유효하다면 만료일자를 검사하자
+            User foundUser = userRepository.findByRefreshToken(refreshToken).orElseThrow();
+            if (!foundUser.getRefreshTokenExpiryDate().before(new Date())) {
+                // 만료일이 오늘보다 이전이 아니라면 -> 만료되지 않았다면
+                String newAccessKey = tokenProvider.createAccessKey(foundUser);
+                return newAccessKey;
+            }
+        }
+        // 리프레시 토큰도 맛이 갔다면 줄 게 없다...
         return null;
     }
 }
