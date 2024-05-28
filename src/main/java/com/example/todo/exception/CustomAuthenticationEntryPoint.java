@@ -24,9 +24,5 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         만약 인증과 꼭 관련된 것이 아닌 다른 예외도 세밀하게 처리해야 한다면 Exception 전용 필터를 구축하는 것이
         더 좋습니다.
          */
-
-
-
-
     }
 }

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+// JWT 필터 관련 Exception 처리
 @Component
 @Slf4j
 public class JWTExceptionFilter extends OncePerRequestFilter {
@@ -44,18 +45,23 @@ public class JWTExceptionFilter extends OncePerRequestFilter {
         } catch (IllegalArgumentException e) {
             log.warn("토큰이 전달되지 않음!");
             setErrorResponse(response, ErrorCode.INVALID_AUTH);
+        } catch (Exception e) {
+            log.warn("알 수 없는 예외 발생!");
         }
 
     }
 
+    // 필터에 예외가 발생하면 response 를 통해 브라우저로 응답하는 메서드
     private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
-        response.setStatus(errorCode.getHttpStatus().value());
-        response.setContentType("application/json; charset=UTF-8");
+        // 응답에 관한 여러가지 설정
+        response.setStatus(errorCode.getHttpStatus().value()); // 응답 상태 코드 (401 or 403)
+        response.setContentType("application/json; charset=UTF-8"); // HTTP content type : message body 에 들어가는 타입
 
-        // Map 생성 및 데이터 추가
+        // (JSON 생성을 위한) Map 생성 및 데이터 추가
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("message", errorCode.getMessage());
+        responseMap.put("message", errorCode.toString());
         responseMap.put("code", errorCode.getHttpStatus());
+        responseMap.put("korean", errorCode.getMessage());
 
         // Map을 JSON 문자열로 변환
         String jsonString = new ObjectMapper().writeValueAsString(responseMap);

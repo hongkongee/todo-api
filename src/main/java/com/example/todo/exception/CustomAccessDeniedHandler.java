@@ -20,6 +20,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         log.warn("AccessDeniedHandler가 반응함! handle 메서드 호출!");
 
+        // 필터에 예외가 발생하면 response 를 통해 브라우저로 응답하는 과정
+
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
         response.setContentType("application/jsonl charset=UTF-8");
 
