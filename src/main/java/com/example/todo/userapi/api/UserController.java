@@ -125,14 +125,15 @@ public class UserController {
     public ResponseEntity<?> loadFile(
             @AuthenticationPrincipal TokenUserInfo userInfo
     ) {
-        try {
+
             // 1. 프로필 사진의 경로부터 얻어야 한다.
             String filePath = userService.findProfilePath(userInfo.getUserId());
             log.info("filePath: {}", filePath);
 
             // 2. 얻어낸 파일 경로를 통해 실제 파일 데이터를 로드하기.
-            File profileFile = new File(filePath);
+//            File profileFile = new File(filePath);
 
+            /*
             // 모든 사용자가 프로필 사진을 가지는 것은 아니다. -> 프사를 등록하지 않은 사람은 해당 경로가 존재하지 않을 것이다.
             // 만약에 존재하지 않는 경로라면 클라이언트로 404 status를 리턴.
             if (!profileFile.exists()) {
@@ -145,6 +146,15 @@ public class UserController {
 
                 return ResponseEntity.notFound().build();
             }
+             */
+
+            if (filePath != null) {
+                return ResponseEntity.ok().body(filePath);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+            /*
             // 해당 경로에 저장된 파일을 바이트 배열로 직렬화 해서 리턴
             byte[] fileData = FileCopyUtils.copyToByteArray(profileFile);
 
@@ -163,7 +173,8 @@ public class UserController {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
+
     }
 
     // 카카오 로그인 요청

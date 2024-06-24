@@ -49,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         boolean isPermitAllUrl = permitAllPatterns.stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, requestURI));
         
-        if (isPermitAllUrl) {
+        if (isPermitAllUrl && !requestURI.contains("load-profile")) {
             filterChain.doFilter(request, response);
             return; // 필터 통과
         }
